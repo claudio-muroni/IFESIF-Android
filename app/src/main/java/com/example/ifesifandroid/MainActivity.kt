@@ -39,17 +39,45 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun HomePage() {
     var presidentList by remember { mutableStateOf(listOf<President>()) }
+    var contractList by remember { mutableStateOf(listOf<Contract>()) }
+    var buttonClicked by remember { mutableStateOf(false) }
+    var presidentClicked by remember { mutableStateOf("") }
+
     LaunchedEffect(key1 = true) {
         delay(2000)
         presidentList = SupabaseApi.retrofitService.getPresidents()
+        contractList = SupabaseApi.retrofitService.getContracts()
+
     }
 
-    if (presidentList.isEmpty()) {
-        Text("Loading...")
-    } else {
-        Column {
-            for (pres in presidentList) {
-                Text(pres.nome)
+    Column {
+        Button(
+            onClick = {
+                buttonClicked = !buttonClicked
+            }
+        ) {
+            Text("Show Presidents")
+        }
+
+        if (buttonClicked) {
+            Column {
+                for (pres in presidentList) {
+                    Button(
+                        onClick = {
+                            presidentClicked = pres.nome
+                        }
+                    ) {
+                        Text(pres.nome)
+                    }
+                }
+            }
+
+            if (presidentClicked != "") {
+                Column {
+                    for (contract in contractList.filter { it.nomePresidente == presidentClicked }) {
+                        Text("${contract.giocatore} ${contract.ruolo} ${contract.prezzoRinnovo}")
+                    }
+                }
             }
         }
     }
