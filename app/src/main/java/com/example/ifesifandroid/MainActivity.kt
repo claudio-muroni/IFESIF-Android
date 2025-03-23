@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        //enableEdgeToEdge()
         setContent {
             IFESIFAndroidTheme {
                 HomePage()
@@ -40,46 +40,30 @@ class MainActivity : ComponentActivity() {
 fun HomePage() {
     var presidentList by remember { mutableStateOf(listOf<President>()) }
     var contractList by remember { mutableStateOf(listOf<Contract>()) }
-    var buttonClicked by remember { mutableStateOf(false) }
     var presidentClicked by remember { mutableStateOf("") }
 
     LaunchedEffect(key1 = true) {
-        delay(2000)
         presidentList = SupabaseApi.retrofitService.getPresidents()
         contractList = SupabaseApi.retrofitService.getContracts()
-
     }
 
     Column {
-        Button(
-            onClick = {
-                buttonClicked = !buttonClicked
+        for (pres in presidentList) {
+            Button(
+                onClick = {
+                    presidentClicked = pres.nome
+                }
+            ) {
+                Text(pres.nome)
             }
-        ) {
-            Text("Show Presidents")
         }
 
-        if (buttonClicked) {
-            Column {
-                for (pres in presidentList) {
-                    Button(
-                        onClick = {
-                            presidentClicked = pres.nome
-                        }
-                    ) {
-                        Text(pres.nome)
-                    }
-                }
-            }
-
-            if (presidentClicked != "") {
-                Column {
-                    for (contract in contractList.filter { it.nomePresidente == presidentClicked }) {
-                        Text("${contract.giocatore} ${contract.ruolo} ${contract.prezzoRinnovo}")
-                    }
-                }
+        if (presidentClicked != "") {
+            for (contract in contractList.filter { it.nomePresidente == presidentClicked }) {
+                Text("${contract.ruolo} ${contract.giocatore} ${contract.prezzoRinnovo}")
             }
         }
+
     }
 }
 
