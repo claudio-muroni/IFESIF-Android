@@ -39,6 +39,25 @@ data class Contract (
     val prezzoRinnovo: Int
 )
 
+@Serializable
+data class RankingPosition (
+    val id: Int,
+
+    @SerialName(value = "id_stagione")
+    val idStagione: Int,
+    val anno: Int,
+
+    val competizione: String,
+    val posizione: Int,
+
+    @SerialName(value = "id_presidente")
+    val idPresidente: Int,
+    @SerialName(value = "nome_presidente")
+    val nomePresidente: String,
+    @SerialName(value = "cognome_presidente")
+    val cognomePresidente: String
+)
+
 private const val BASE_URL = "https://filxsmvgahceegvhzdee.supabase.co"
 private const val ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpbHhzbXZnYWhjZWVndmh6ZGVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc4NDQyMzMsImV4cCI6MjA1MzQyMDIzM30.pfSVEKiUtrCDzfH844CER82ce13stzGjTVtCeCwaMhA"
 
@@ -54,6 +73,9 @@ interface SupabaseApiService {
 
     @GET("rest/v1/contratti?apikey=$ANON_KEY")
     suspend fun getContracts(): List<Contract>
+
+    @GET("rest/v1/classifiche?apikey=$ANON_KEY")
+    suspend fun getRankingPositions(): List<RankingPosition>
 }
 
 object SupabaseApi {
@@ -74,6 +96,12 @@ suspend fun main() {
     val contractList = SupabaseApi.retrofitService.getContracts()
     for (contract in contractList.filter { it.nomePresidente == "Flavio" }) {
         println(contract)
+    }
+
+    println("CLASSIFICHE")
+    val rankingPositionList = SupabaseApi.retrofitService.getRankingPositions()
+    for (rankingPosition in rankingPositionList.filter { it.anno == 2024 }) {
+        println(rankingPosition)
     }
 
 }
